@@ -1,0 +1,9 @@
+<div class="film-szczegoly">
+  <h5>Szczegóły filmu:</h5>
+  <p><strong>Tytuł:</strong> {{ film.tytul }}</p>
+  <p><strong>Reżyser:</strong> {{ film.rezyser }}</p>
+  <p><strong>Rok wydania:</strong> {{ film.rok_wydania }}</p>
+  <p><strong>Opis:</strong> {{ film.opis }}</p>
+  <p><strong>Kategorie:</strong> {{ film.kategorie.all|join:", " }}</p>
+  <p><strong>Średnia ocena:</strong> {{ srednia_ocena|default:"Brak ocen" }}</p>
+</div>

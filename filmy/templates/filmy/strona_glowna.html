@@ -1,0 +1,74 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2>Najlepsze 5 filmów</h2>
+    <div class="list-group">
+      {% for film in najlepsze_filmy %}
+      <div class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ film.tytul }}</h5>
+          <small>Średnia ocena: {{ film.srednia_ocena|default:"Brak ocen" }}</small>
+        </div>
+        <p class="mb-1">
+          <button class="btn btn-primary btn-sm" onclick="pokazSzczegoly('film', {{ film.id }})">Pokaż szczegóły</button>
+          <div id="szczegoly-film-{{ film.id }}" style="display:none;"></div>
+        </p>
+        <small>
+          {% if film.ocena_istnieje %}
+            Twoja Ocena: {{ film.ocena_uzytkownika|default:"Nie oceniłeś/aś" }}
+            <a href="{% url 'zmien_ocene_filmu' film.id %}" class="btn btn-outline-primary btn-sm">Zmień ocenę</a>
+          {% elif request.user.is_authenticated %}
+          <a href="{% url 'dodaj_ocene_filmu' film.id %}" class="btn btn-outline-secondary btn-sm">Dodaj ocenę</a>
+          {% endif %}
+        </small>
+      </div>
+      {% endfor %}
+    </div>
+
+    <h2 class="mt-4">Najlepsze 5 seriali</h2>
+    <div class="list-group">
+      {% for serial in najlepsze_seriale %}
+      <div class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ serial.tytul }}</h5>
+          <small>Średnia ocena: {{ serial.srednia_ocena|default:"Brak ocen" }}</small>
+        </div>
+        <p class="mb-1">
+          <button class="btn btn-primary btn-sm" onclick="pokazSzczegoly('serial', {{ serial.id }})">Pokaż szczegóły</button>
+          <div id="szczegoly-serial-{{ serial.id }}" style="display:none;"></div>
+        </p>
+        <small>
+          {% if serial.ocena_istnieje %}
+            Twoja Ocena: {{ serial.ocena_uzytkownika|default:"Nie oceniłeś/aś" }}
+            <a href="{% url 'zmien_ocene_serialu' serial.id %}" class="btn btn-outline-primary btn-sm">Zmień ocenę</a>
+          {% elif request.user.is_authenticated %}
+            <a href="{% url 'dodaj_ocene_serialu' serial.id %}" class="btn btn-outline-secondary btn-sm">Dodaj ocenę</a>
+          {% endif %}
+        </small>
+      </div>
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+  function pokazSzczegoly(typ, id) {
+      var szczegolyDiv = document.getElementById('szczegoly-' + typ + '-' + id);
+      var url = `/ajax/szczegoly-${typ}/${id}/`;
+  
+      if (szczegolyDiv.innerHTML === "") {
+          fetch(url)
+              .then(response => response.text())
+              .then(html => {
+                  szczegolyDiv.innerHTML = html;
+                  szczegolyDiv.style.display = 'block';
+              })
+              .catch(error => console.error('Błąd:', error));
+      } else {
+          szczegolyDiv.style.display = szczegolyDiv.style.display === 'none' ? 'block' : 'none';
+      }
+  }
+  </script>
+{% endblock %}

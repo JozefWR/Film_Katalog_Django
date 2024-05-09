@@ -1,0 +1,94 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2 class="text-center">Wyniki wyszukiwania dla: "{{ query }}"</h2>
+    <div class="sort-options mb-3">
+        <form method="get" action="" class="form-inline justify-content-center">
+            <label for="sort" class="mr-2">Sortuj według:</label>
+            <select name="sort" id="sort" class="form-control" onchange="this.form.submit()">
+                <option value="tytul" {% if sort_by == 'tytul' %}selected{% endif %}>Tytuł</option>
+                <option value="rok_wydania" {% if sort_by == 'rok_wydania' %}selected{% endif %}>Data</option>
+                <option value="kategorie__nazwa" {% if sort_by == 'kategorie__nazwa' %}selected{% endif %}>Kategoria</option>
+            </select>
+            <input type="hidden" name="q" value="{{ query }}">
+        </form>
+    </div>
+
+    {% if filmy or seriale %}
+        <h3>Filmy</h3>
+        <div class="list-group">
+            {% for film in filmy %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ film.tytul }} ({{ film.rok_wydania }})</h5>
+                        <small>Kategorie: {% for kategoria in film.kategorie.all %}{{ kategoria.nazwa }}{% if not forloop.last %}, {% endif %}{% endfor %}</small>
+                    </div>
+                    <p>
+                        <button class="btn btn-primary btn-sm" onclick="pokazSzczegoly('film', {{ film.id }})">Pokaż szczegóły</button>
+                        <div id="szczegoly-film-{{ film.id }}" style="display:none;"></div>
+                    </p>
+                    {% if request.user.is_authenticated %}
+                        <small>
+                            {% if film.ocena_istnieje %}
+                                Twoja ocena: {{ film.ocena_uzytkownika }}
+                                <a href="{% url 'zmien_ocene_filmu' film.id %}" class="btn btn-outline-primary btn-sm">Zmień ocenę</a>
+                            {% else %}
+                                <a href="{% url 'dodaj_ocene_filmu' film.id %}" class="btn btn-outline-secondary btn-sm">Dodaj ocenę</a>
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <h3>Seriale</h3>
+        <div class="list-group">
+            {% for serial in seriale %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ serial.tytul }} - rozpoczęcie emisji: {{ serial.poczatek_emisji }}</h5>
+                        <small>Kategorie: {% for kategoria in serial.kategorie.all %}{{ kategoria.nazwa }}{% if not forloop.last %}, {% endif %}{% endfor %}</small>
+                    </div>
+                    <p>
+                        <button class="btn btn-primary btn-sm" onclick="pokazSzczegoly('serial', {{ serial.id }})">Pokaż szczegóły</button>
+                        <div id="szczegoly-serial-{{ serial.id }}" style="display:none;"></div>
+                    </p>
+                    {% if request.user.is_authenticated %}
+                        <small>
+                            {% if serial.ocena_istnieje %}
+                                Twoja ocena: {{ serial.ocena_uzytkownika }}
+                                <a href="{% url 'zmien_ocene_serialu' serial.id %}" class="btn btn-outline-primary btn-sm">Zmień ocenę</a>
+                            {% else %}
+                                <a href="{% url 'dodaj_ocene_serialu' serial.id %}" class="btn btn-outline-secondary btn-sm">Dodaj Ocenę</a>
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">Brak wyników do wyświetlenia.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    function pokazSzczegoly(typ, id) {
+        var szczegolyDiv = document.getElementById('szczegoly-' + typ + '-' + id);
+        var url = `/ajax/szczegoly-${typ}/${id}/`;
+    
+        if (szczegolyDiv.innerHTML === "") {
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    szczegolyDiv.innerHTML = html;
+                    szczegolyDiv.style.display = 'block';
+                })
+                .catch(error => console.error('Błąd:', error));
+        } else {
+            szczegolyDiv.style.display = szczegolyDiv.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+    </script>
+{% endblock %}

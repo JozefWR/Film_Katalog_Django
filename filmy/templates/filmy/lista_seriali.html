@@ -1,0 +1,64 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2 class="text-center">Lista Seriali</h2>
+    <div class="sort-options mb-3">
+        <form method="get" action="" class="form-inline justify-content-center">
+            <label for="sort" class="mr-2">Sortuj według:</label>
+            <select name="sort" id="sort" class="form-control" onchange="this.form.submit()">
+                <option value="tytul" {% if request.GET.sort == 'tytul' %}selected{% endif %}>Tytuł</option>
+                <option value="poczatek_emisji" {% if request.GET.sort == 'poczatek_emisji' %}selected{% endif %}>Data rozpoczęcia emisji</option>
+                <option value="kategorie__nazwa" {% if request.GET.sort == 'kategorie__nazwa' %}selected{% endif %}>Kategoria</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="list-group">
+        {% for item in seriale_oceny %}
+        <div class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ item.serial.tytul }} - rozpoczęcie emisji: {{ item.serial.poczatek_emisji }}</h5>
+                <small>Kategorie: {% for kategoria in item.serial.kategorie.all %}{{ kategoria.nazwa }}{% if not forloop.last %}, {% endif %}{% endfor %}</small>
+            </div>
+            <div>
+                <button class="btn btn-primary btn-sm" onclick="pokazSzczegoly('serial', {{ item.serial.id }})">Pokaż szczegóły</button>
+                <div id="szczegoly-serial-{{ item.serial.id }}" class="mt-2" style="display:none;"></div>
+            </div>
+
+            {% if user.is_authenticated %}
+            <div class="mt-2">
+                {% if item.ocena_istnieje %}
+                    Twoja ocena: {{ item.ocena }}
+                    <a href="{% url 'zmien_ocene_serialu' item.serial.id %}" class="btn btn-outline-primary btn-sm">Zmień ocenę</a>
+                {% else %}
+                    <a href="{% url 'dodaj_ocene_serialu' item.serial.id %}" class="btn btn-outline-secondary btn-sm">Dodaj ocenę</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    function pokazSzczegoly(typ, id) {
+        var szczegolyDiv = document.getElementById('szczegoly-' + typ + '-' + id);
+        var url = `/ajax/szczegoly-${typ}/${id}/`; 
+        
+        if (szczegolyDiv.innerHTML === "") {
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    szczegolyDiv.innerHTML = html;
+                    szczegolyDiv.style.display = 'block';
+                })
+                .catch(error => console.error('Błąd:', error));
+        } else {
+            szczegolyDiv.style.display = szczegolyDiv.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+</script>
+{% endblock %}

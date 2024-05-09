@@ -1,0 +1,9 @@
+<div class="serial-szczegoly">
+  <h5>Szczegóły serialu:</h5>
+  <p><strong>Tytuł:</strong> {{ serial.tytul }}</p>
+  <p><strong>Opis:</strong> {{ serial.opis }}</p>
+  <p><strong>Początek emisji:</strong> {{ serial.poczatek_emisji }}</p>
+  <p><strong>Koniec emisji:</strong> {% if serial.koniec_emisji %}{{ serial.koniec_emisji }}{% else %}Nadal trwa{% endif %}</p>
+  <p><strong>Kategorie:</strong> {{ serial.kategorie.all|join:", " }}</p>
+  <p><strong>Średnia ocena:</strong> {{ srednia_ocena|default:"Brak ocen" }}</p>
+</div>
