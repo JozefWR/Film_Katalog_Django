@@ -3,8 +3,6 @@
 ## O Projekcie
 Projekt "Katalog Filmów" to aplikacja webowa zbudowana w frameworku Django, która pozwala użytkownikom na przeglądanie, ocenianie oraz uzyskiwanie szczegółowych informacji o filmach i serialach. Aplikacja oferuje funkcjonalności takie jak autentykacja użytkowników, wyszukiwanie treści oraz interaktywne ocenianie.
 
-![Strona Główna](url_do_obrazka_strona_glowna) *Zastąp `url_do_obrazka_strona_glowna` rzeczywistym URL obrazka.*
-
 ## Funkcjonalności
 
 - **Autentykacja użytkownika:** Rejestracja, logowanie, wylogowanie.
@@ -18,8 +16,6 @@ Projekt "Katalog Filmów" to aplikacja webowa zbudowana w frameworku Django, kt�
 - **Backend:** Django 5.0.4
 - **Frontend:** HTML, CSS (Bootstrap 5), JavaScript
 - **Database:** SQLite3
-
-## Instalacja i uruchomienie
 
 ### Wymagania wstępne
 
